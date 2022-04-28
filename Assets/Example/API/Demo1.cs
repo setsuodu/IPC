@@ -22,7 +22,6 @@ public class Demo1 : MonoBehaviour
     //private const int IPC_CMD_GF_CONTROL = 2;
     private const int IPC_BUFFER = 10240; //最大缓冲长度
     private const int IDT_ASYNCHRONISM = 0x0201;
-    private const uint WM_COPYDATA = 0x004A; //74
 
     // 数据包头配合使用
     public unsafe struct IPC_Head
@@ -38,7 +37,7 @@ public class Demo1 : MonoBehaviour
         public fixed byte cbBuffer[IPC_BUFFER]; //指针。存放json数据 利用byte[]接收存放 
     }
 
-    private const string winTitle = "winform"; //窗体标题
+    private const string winTitle = "noname"; //窗体标题
     private static IntPtr hWndPalaz; //目标窗体
     private static IntPtr m_hWnd; //游戏本身句柄 
 
@@ -106,7 +105,7 @@ public class Demo1 : MonoBehaviour
         CopyDataStruct.lpData = (IntPtr)pPCBuffer;
         CopyDataStruct.dwData = (IntPtr)IDT_ASYNCHRONISM;
         CopyDataStruct.cbData = IPCBuffer.Head.wPacketSize;
-        SendMessage(hWndServer, WM_COPYDATA, (int)m_hWnd, ref CopyDataStruct);
+        SendMessage(hWndServer, Demo3.WM_COPYDATA, (int)m_hWnd, ref CopyDataStruct);
         return true;
     }
 }

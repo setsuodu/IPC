@@ -1,14 +1,19 @@
 using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Windows;
+using System.Runtime.InteropServices;
 
 public class UI_Login : MonoBehaviour
 {
     [SerializeField] Button m_LoginBtn;
     [SerializeField] Button m_SetNameBtn;
-    public bool loop;
-    public int age;
-    public string title;
+    public bool loop = false;
+    public int age = 1;
+    public string appName = "noname";
+    public string appRename = "改名";
 
     void Awake()
     {
@@ -20,7 +25,7 @@ public class UI_Login : MonoBehaviour
 
     void OnLoginBtnClick()
     {
-        Debug.Log("登陆");
+        //Debug.Log("登陆");
 
         //发送用户准备好消息
         JsonModel model = new JsonModel();
@@ -34,11 +39,9 @@ public class UI_Login : MonoBehaviour
     // 设置窗口名
     public void SetWindowText()
     {
-        IntPtr hWndPalaz = Demo1.FindWindow(null, "tata");
-        //Debug.Log($"获得游戏本身句柄：{(int)hWndPalaz}");
-        IntPtr m_hWnd = Demo1.FindWindow("UnityWndClass", null);
-        //Demo3.SetWindowText(m_hWnd, title);
-        Demo3.SendMessage(hWndPalaz, 0x0005, (IntPtr)1024, (IntPtr)720);
+        //IntPtr m_hWnd = Demo1.FindWindow(null, appName); //根据名字找，改名后会丢
+        IntPtr m_hWnd = Demo1.FindWindow("UnityWndClass", null); //改标题不会丢
+        //Demo3.SetWindowText(m_hWnd, appRename);
     }
 
     void Update()

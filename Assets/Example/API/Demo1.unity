@@ -1086,6 +1086,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LoginBtn: {fileID: 0}
   m_SetNameBtn: {fileID: 0}
-  loop: 0
-  age: 0
-  title: 
+  loop: 1
+  age: 1
+  appName: noname
+  appRename: "\u6539\u540D"

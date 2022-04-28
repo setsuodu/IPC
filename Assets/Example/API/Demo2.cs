@@ -141,7 +141,7 @@ public class Demo2 : MonoBehaviour
 
                 IntPtr intp = new IntPtr(entries1.cbBuffer);
                 string str = new string((sbyte*)intp);
-                print("json数据：" + str);
+                //Debug.LogError("json数据：" + str);
                 mOutput.text = str;
             }
 

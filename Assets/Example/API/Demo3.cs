@@ -41,40 +41,22 @@ public class Demo3 : MonoBehaviour
     [DllImport("user32", CharSet = CharSet.Unicode)]
     public static extern bool SetWindowText(IntPtr hwnd, string title);
 
-    // 这个不会返回名称
-    //[DllImport("user32", CharSet = CharSet.Unicode)]
-    //static extern int GetWindowText();
-    //[DllImport("user32.dll")]
-    //public static extern int GetWindowTextLength(IntPtr hWnd);
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, [Out] StringBuilder lParam);
     [DllImport("user32.dll")]
-    public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam); //wParam:消息，lParam:指针
 
-    //[DllImport("comdlg32.dll", CharSet = CharSet.Auto)]
-    //public static extern bool ChooseColorA([In, Out] CHOOSECOLOR pChoosecolor);//对应的win32API
-    //public class CHOOSECOLOR
-    //{
-    //    public Int32 lStructSize = Marshal.SizeOf(typeof(CHOOSECOLOR));
-    //    public IntPtr hwndOwner;
-    //    public IntPtr hInstance;
-    //    public Int32 rgbResult;
-    //    public IntPtr lpCustColors;
-    //    public Int32 Flags;
-    //    public IntPtr lCustData = IntPtr.Zero;
-    //    public WndProc lpfnHook;
-    //    public string lpTemplateName;
-    //}
-
-    const int SWP_SHOWWINDOW = 0x0040;
-    const int GWL_EXSTYLE = -20;
-    const int GWL_STYLE = -16;
-    const int WS_CAPTION = 0x00C00000;
-    const int WS_BORDER = 0x00800000;
-    const int WS_EX_LAYERED = 0x80000;
-    const int LWA_COLORKEY = 0x1;
-    const int LWA_ALPHA = 0x2;
-    const int WM_GETTEXT = 0xD;
+    public const int SWP_SHOWWINDOW = 0x0040;
+    public const int GWL_EXSTYLE = -20;
+    public const int GWL_STYLE = -16;
+    public const int WS_CAPTION = 0x00C00000;
+    public const int WS_BORDER = 0x00800000;
+    public const int WS_EX_LAYERED = 0x80000;
+    public const int LWA_COLORKEY = 0x1;
+    public const int LWA_ALPHA = 0x2;
+    public const int WM_SETTEXT = 0x000C;
+    public const int WM_GETTEXT = 0xD;
+    public const uint WM_COPYDATA = 0x004A; //74
 
     private IntPtr handle;
 
@@ -103,7 +85,13 @@ public class Demo3 : MonoBehaviour
     {
         // needs to be big enough for the whole text
         StringBuilder sb = new StringBuilder(ushort.MaxValue);
-        Demo3.SendMessage(handle, WM_GETTEXT, (IntPtr)sb.Capacity, sb);
+        SendMessage(handle, WM_GETTEXT, (IntPtr)sb.Capacity, sb);
         Debug.Log(sb.ToString());
+    }
+
+    // 修改窗口名
+    public void SetWindowText(IntPtr handle)
+    {
+        SendMessage(handle, WM_SETTEXT, IntPtr.Zero, new StringBuilder("Hello World!"));
     }
 }
