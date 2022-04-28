@@ -26,7 +26,7 @@ public class Demo1 : MonoBehaviour
     //宏定义 
     private const ushort IPC_VER = 1;
     private const int IDT_ASYNCHRONISM = 0x0201;
-    private const uint WM_COPYDATA = 0x004A;
+    private const uint WM_COPYDATA = 0x004A; //74
     private const ushort IPC_CMD_GF_SOCKET = 1;
     private const ushort IPC_SUB_GF_SOCKET_SEND = 1;
     private const int IPC_SUB_GF_CLIENT_READY = 1;
@@ -122,7 +122,7 @@ public class Demo1 : MonoBehaviour
         CopyDataStruct.lpData = (IntPtr)pPCBuffer;
         CopyDataStruct.dwData = (IntPtr)IDT_ASYNCHRONISM;
         CopyDataStruct.cbData = IPCBuffer.Head.wPacketSize;
-        SendMessage(hWndServer, 0x004A, (int)m_hWnd, ref CopyDataStruct);
+        SendMessage(hWndServer, WM_COPYDATA, (int)m_hWnd, ref CopyDataStruct);
         return true;
     }
 
