@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class Demo3 : MonoBehaviour
 {
-    public static Demo3 _instance;
+    static Demo3 _instance;
     public static Demo3 Instance
     {
         get
@@ -40,6 +39,10 @@ public class Demo3 : MonoBehaviour
 
     [DllImport("user32", CharSet = CharSet.Unicode)]
     static extern bool SetWindowText(IntPtr hwnd, string title);
+
+    //[DllImport("user32", CharSet = CharSet.Unicode)]
+    //static extern void GetWindowText();
+    //static extern int GetWindowText（HWND hWnd，LPTSTR lpString，Int nMaxCount）;
 
     const int SWP_SHOWWINDOW = 0x0040;
     const int GWL_EXSTYLE = -20;
