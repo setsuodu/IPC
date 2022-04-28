@@ -57,7 +57,8 @@ public class Demo1 : MonoBehaviour
     /// </summary>
     private void sendJson()
     {
-        IntPtr hWndPalaz = FindWindow(null, "New Unity Project");//就是窗体的的标题
+        IntPtr hWndPalaz = FindWindow(null, "winform");
+        //IntPtr hWndPalaz = FindWindow(null, "New Unity Project");//就是窗体的的标题
         if (hWndPalaz != null)
         {
             Debug.Log("获得游戏本身句柄：" + (int)hWndPalaz);
