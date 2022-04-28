@@ -3,7 +3,14 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
 
-//钩子接收消息的结构
+// 钩子发送消息结构体
+public struct COPYDATASTRUCT
+{
+    public IntPtr dwData;
+    public int cbData;
+    public IntPtr lpData;
+}
+// 钩子接收消息的结构
 public struct CWPSTRUCT
 {
     public int lparam;
@@ -12,20 +19,26 @@ public struct CWPSTRUCT
     public IntPtr hwnd;
 }
 
+public class JsonModel
+{
+    public string name;
+    public int age;
+    public string area;
+}
+
 public class Demo2 : MonoBehaviour
 {
+    #region IPC
+
     //建立钩子
     [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
     private static extern int SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, uint dwThreadId);
-
     //移除钩子
     [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
     private static extern bool UnhookWindowsHookEx(int idHook);
-
     //把信息传递到下一个监听
     [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
     private static extern int CallNextHookEx(int idHook, int nCode, int wParam, int lParam);
-
     //回调委托
     private delegate int HookProc(int nCode, int wParam, int lParam);
 
@@ -59,24 +72,31 @@ public class Demo2 : MonoBehaviour
         public IntPtr lpData;
     }
 
+    #endregion
+
     public Text mOutput;
+
+    private bool _bCallNext;
+    public bool CallNextProc
+    {
+        get { return _bCallNext; }
+        set { _bCallNext = value; }
+    }
 
     void Start()
     {
-        //安装钩子
         HookLoad();
     }
 
     void OnDestroy()
     {
-        //关闭钩子
         HookClosing();
     }
 
-    private void HookLoad()
+    // 安装钩子
+    void HookLoad()
     {
         print("开始运行");
-        //安装钩子
         {
             //钩子委托
             HookProc lpfn = new HookProc(Hook);
@@ -87,7 +107,7 @@ public class Demo2 : MonoBehaviour
             {
                 print("钩子[" + idHook + "]安装成功");
                 isHook = true;
-                //保持活动 避免 回调过程 被垃圾回收
+                // 保持活动 避免 回调过程 被垃圾回收
                 gc = GCHandle.Alloc(lpfn);
             }
             else
@@ -99,31 +119,22 @@ public class Demo2 : MonoBehaviour
         }
     }
 
-    //卸载钩子
-    private void HookClosing()
+    // 卸载钩子
+    void HookClosing()
     {
         if (isHook)
-        {
             UnhookWindowsHookEx(idHook);
-        }
     }
 
-    private bool _bCallNext;
-    public bool CallNextProc
-    {
-        get { return _bCallNext; }
-        set { _bCallNext = value; }
-    }
-
-    //钩子回调
-    private unsafe int Hook(int nCode, int wParam, int lParam)
+    // 钩子回调（有BUG：必须点击窗口才收得到）
+    unsafe int Hook(int nCode, int wParam, int lParam)
     {
         try
         {
             IntPtr p = new IntPtr(lParam);
             CWPSTRUCT m = (CWPSTRUCT)Marshal.PtrToStructure(p, typeof(CWPSTRUCT));
 
-            if (m.message == 74)
+            if (m.message == 0x004A)
             {
                 COPYDATASTRUCT entries = (COPYDATASTRUCT)Marshal.PtrToStructure((IntPtr)m.lparam, typeof(COPYDATASTRUCT));
                 IPC_Buffer entries1 = (IPC_Buffer)Marshal.PtrToStructure((IntPtr)entries.lpData, typeof(IPC_Buffer));
@@ -133,14 +144,15 @@ public class Demo2 : MonoBehaviour
                 print("json数据：" + str);
                 mOutput.text = str;
             }
+
             if (CallNextProc)
             {
                 return CallNextHookEx(idHook, nCode, wParam, lParam);
             }
             else
             {
-                //return 1;
-                return CallNextHookEx(idHook, nCode, wParam, lParam);
+                return 1;
+                //return CallNextHookEx(idHook, nCode, wParam, lParam);
             }
         }
         catch (Exception ex)
@@ -152,9 +164,10 @@ public class Demo2 : MonoBehaviour
 
     public void OutputDebug()
     {
-        Debug.Log("外部调试...");
-        int tt = 1;
-        tt += 1;
-        Debug.Log(tt);
+        //Debug.Log("外部调试...");
+        //int tt = 1;
+        //tt += 1;
+        //Debug.Log(tt);
+        mOutput.text = "";
     }
 }
