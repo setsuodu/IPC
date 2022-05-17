@@ -3,6 +3,7 @@ using System.Text;
 using System.IO.Pipes;
 using System.Threading;
 using UnityEngine;
+using System.IO;
 
 public class Program : MonoBehaviour
 {
@@ -12,13 +13,12 @@ public class Program : MonoBehaviour
 
     void Start()
     {
-        Loom.Initialize();
         Loom.RunAsync(WaitData);
     }
 
     void OnDestroy()
     {
-        pipeServer?.Close();
+        Close();
     }
 
     static void WaitData()
@@ -31,9 +31,7 @@ public class Program : MonoBehaviour
                 var buffer = new byte[1024];
                 pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 2);
                 pipeServer.WaitForConnection();
-                //StreamReader sr = new StreamReader(pipeServer);
-                //sr.Close();
-                //string con = sr.ReadLine();
+
                 var len = pipeServer.Read(buffer, 0, buffer.Length);
                 string con = Encoding.UTF8.GetString(buffer, 0, len);
 
@@ -48,6 +46,31 @@ public class Program : MonoBehaviour
                 pipeServer?.Dispose();
                 print("pipeServer exception:" + ex.Message);
             }
+        }
+    }
+
+    static void Close()
+    {
+        if (pipeServer != null && pipeServer.IsConnected)
+            return;
+        _cancelled = true;
+        try
+        {
+            var pipe = new NamedPipeClientStream(PipeName);
+            pipe.Connect(500);
+            pipe.Flush();
+            pipe.Close();
+        }
+        catch (FileNotFoundException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+        }
+        finally
+        {
+            pipeServer?.Close();
         }
     }
 }
